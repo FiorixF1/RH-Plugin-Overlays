@@ -12,19 +12,44 @@ from flask import templating
 from flask.blueprints import Blueprint
 
 # Read the JSON file
-with open('plugins/ddr_overlays/static/data/countries.json', 'r') as file:
-    countries_data = json.load(file)
-options = []
-for country in countries_data:
-    code = country["alpha2"]
-    name = country["name"]
+try:
+    with open('plugins/ddr_overlays/static/data/countries.json', 'r') as file:
+        countries_data = json.load(file)
+    options = []
+    for country in countries_data:
+        code = country["alpha2"]
+        name = country["name"]
+        option = UIFieldSelectOption(code, name)
+        options.append(option)
+    options.sort(key=lambda x: x.label)
+except:
+    code = "it"
+    name = "Italy"
     option = UIFieldSelectOption(code, name)
-    options.append(option)
-options.sort(key=lambda x: x.label)
-country_ui_field = UIField('country', "Country Code", UIFieldType.SELECT, options=options, value="")
+    options = [option]
+finally:
+    country_ui_field = UIField('country', "Country Code", UIFieldType.SELECT, options=options, value="")
+
+# Read the TXT file
+try:
+    custom_teams = True
+    with open('plugins/ddr_overlays/static/data/teams.txt', 'r') as file:
+        teams_data = file.readlines()
+    teams_data = list(filter(lambda x: x, map(lambda x: x.strip(), teams_data)))
+    teams_data.sort()
+except:
+    custom_teams = False
+    team_ui_field = UIField('team', "Team", UIFieldType.TEXT)
 
 def initialize(rhapi):
     rhapi.fields.register_pilot_attribute( country_ui_field )
+    if custom_teams:
+        try:
+            rhapi._racecontext.rhui._racecontext.rhdata.TEAM_NAMES_LIST = [''] + teams_data
+        except:
+            rhapi.fields.register_pilot_attribute( team_ui_field )
+    else:
+        rhapi.fields.register_pilot_attribute( team_ui_field )
 
     bp = Blueprint(
         'ddr_overlays',

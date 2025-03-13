@@ -181,6 +181,11 @@ function build_nextup(leaderboard, display_type, meta, ddr_pilot_data, show_posi
             pilotImg = '/ddr_overlays/static/imgs/no_avatar.png';
         }
 
+        let teamImg = '/ddr_overlays/static/imgs/teams/' + pilot.team.replace(/ /g,"_").toLowerCase() + '.jpg';       
+        if (!imageExists(teamImg)) {
+            teamImg = '/ddr_overlays/static/imgs/no_team.png';
+        } // add team to HTML
+
         let html = '<div class="nextup_pilot">';
         if (show_position) {
             let position_strings = ["1st", "2nd", "3rd", "4th"];
@@ -190,7 +195,7 @@ function build_nextup(leaderboard, display_type, meta, ddr_pilot_data, show_posi
             // var fastest_lap = leaderboard[i].fastest_lap;
             // var consecutives = leaderboard[i].consecutives;
         }
-        html += '<div class="nextup_pilot_avatar"><div class="nextup_pilot_avatar_mask"><img src="' + pilotImg + '" alt="Avatar"></div></div><div class="nextup_pilot_flag"><div class="nextup_pilot_flag_mask"><img src="/ddr_overlays/static/imgs/flags/'+flag+'.jpg"></div></div><div class="nextup_pilot_name">' + pilot_name + '</div></div>';
+        html += '<div class="nextup_pilot_avatar"><div class="nextup_pilot_avatar_mask"><img src="' + pilotImg + '" alt="Avatar"></div></div><div class="nextup_pilot_flag"><div class="nextup_pilot_flag_mask"><img src="/ddr_overlays/static/imgs/flags/' + flag + '.jpg"></div></div><div class="nextup_pilot_name">' + pilot_name + '</div></div>';
 
         $('#nextup_pilot_box').append(html);
     }
@@ -278,12 +283,16 @@ function build_leaderboard(leaderboard, display_type, meta, number_of_pilots=999
             // ADD AVATAR
 
             var pilotImg = '/static/user/avatars/' + leaderboard[i].callsign.replace(/ /g,"_").toLowerCase() + '.jpg';
-
             if (!imageExists(pilotImg)) {
                 pilotImg = '/ddr_overlays/static/imgs/no_avatar.png';
             }
 
             row.append('<td class="avatar"><img src=" ' + pilotImg + ' "></td>');
+
+            let teamImg = '/ddr_overlays/static/imgs/teams/' + leaderboard[i].team.replace(/ /g,"_").toLowerCase() + '.jpg';       
+            if (!imageExists(teamImg)) {
+                teamImg = '/ddr_overlays/static/imgs/no_team.png';
+            } // add team to HTML
 
             let flag = getPilotFlag(leaderboard[i].pilot_id, ddr_pilot_data);
             row.append('<td class="flag" id="pilot_id_flag_' + leaderboard[i].pilot_id + '"><img class="country_flag" src="/ddr_overlays/static/imgs/flags/' + flag + '.jpg".jpg"></td>');
@@ -291,7 +300,7 @@ function build_leaderboard(leaderboard, display_type, meta, number_of_pilots=999
             country_flag = '';
             var pilot_name_flag = leaderboard[i].callsign;
 
-            row.append('<td class="pilot">'+ pilot_name_flag +'</td>');
+            row.append('<td class="pilot">' + pilot_name_flag + '</td>');
             if (meta.team_racing_mode) {
                 row.append('<td class="team">' + leaderboard[i].team_name + '</td>');
             }
@@ -396,7 +405,7 @@ function build_leaderboard(leaderboard, display_type, meta, number_of_pilots=999
 
 
 
-/* Pilot flags */
+/* Pilot flags and teams */
 function getPilotFlag(pilot_id, ddr_pilot_data) {
     count = Object.keys(ddr_pilot_data).length;
     for (var i = 0; i < count; i++) {
@@ -413,6 +422,21 @@ function getPilotFlag(pilot_id, ddr_pilot_data) {
         }
     }
     return 'it';
+}
+
+function getPilotTeam(pilot_id, ddr_pilot_data) {
+    count = Object.keys(ddr_pilot_data).length;
+    for (var i = 0; i < count; i++) {
+        let pilot = ddr_pilot_data[i];
+        if (pilot.pilot_id == pilot_id) {
+            pilot = ddr_pilot_data[i];
+            if (pilot.team) {
+                return pilot.team;
+            }
+            break;
+        }
+    }
+    return '';
 }
 
 function imageExists(image_url) {
@@ -571,6 +595,11 @@ function build_elimination_brackets(race_bracket_type, race_class_id, ddr_pilot_
                 if (!imageExists(pilotImg)) {
                     pilotImg = '/ddr_overlays/static/imgs/no_avatar.png';
                 }
+
+                let teamImg = '/ddr_overlays/static/imgs/teams/' + pilot.team.replace(/ /g,"_").toLowerCase() + '.jpg';       
+                if (!imageExists(teamImg)) {
+                    teamImg = '/ddr_overlays/static/imgs/no_team.png';
+                } // add team to HTML
 
                 html += '<div class="bracket_race_pilot">';
 
